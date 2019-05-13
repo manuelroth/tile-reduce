@@ -1,13 +1,19 @@
-'use strict';
+"use strict";
 
-var VectorTile = require('@mapbox/vector-tile').VectorTile;
-var Pbf = require('pbf');
+var VectorTile = require("@mapbox/vector-tile").VectorTile;
+var Pbf = require("pbf");
 
 module.exports = parseData;
 
 function parseData(data, tile, source) {
-  var layers = new VectorTile(new Pbf(data)).layers;
-  return source.raw ? layers : toGeoJSON(layers, tile, source);
+  var raw = new VectorTile(new Pbf(data));
+  if (source.tile) {
+    return raw;
+  } else if (source.raw) {
+    return raw.layers;
+  } else {
+    return toGeoJSON(raw.layers, tile, source);
+  }
 }
 
 function toGeoJSON(layers, tile, source) {
@@ -17,7 +23,7 @@ function toGeoJSON(layers, tile, source) {
     if (source.layers && source.layers.indexOf(layerId) === -1) continue;
 
     collections[layerId] = {
-      type: 'FeatureCollection',
+      type: "FeatureCollection",
       features: []
     };
     for (var k = 0; k < layers[layerId].length; k++) {
