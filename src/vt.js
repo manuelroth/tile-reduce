@@ -6,13 +6,15 @@ var Pbf = require("pbf");
 module.exports = parseData;
 
 function parseData(data, tile, source) {
-  var layers = new VectorTile(new Pbf(data)).layers;
+  var raw = new VectorTile(new Pbf(data));
   if (source.data) {
     return data;
+  } else if (source.tile) {
+    return raw;
   } else if (source.raw) {
-    return layers;
+    return raw.layers;
   } else {
-    return toGeoJSON(layers, tile, source);
+    return toGeoJSON(raw.layers, tile, source);
   }
 }
 
